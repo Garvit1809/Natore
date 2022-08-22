@@ -3,12 +3,13 @@ const tourController = require('./../Controllers/tourController');
 
 const router = express.Router();
 
-router.param('id', tourController.checkID);
+// router.param('id', tourController.checkID);  --> Param Middleware
 
 router
   .route('/')
   .get(tourController.getAllTours)
-  .post(tourController.checkBody, tourController.createTour);
+  .post( tourController.createTour);
+  // .post(tourController.checkBody, tourController.createTour); --> can pass middlewares like this
 
 router
   .route('/:id')
