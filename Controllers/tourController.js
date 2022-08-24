@@ -1,5 +1,6 @@
-const { query } = require('express');
-const Tour = require('../Models/tourModel');
+const { query } = require("express");
+const Tour = require("../Models/tourModel");
+const APIFeatures = require('../Utils/apiFeatures');
 
 // const fs = require('fs');
 
@@ -29,115 +30,103 @@ const Tour = require('../Models/tourModel');
 //   next();
 // };
 
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = "5";
+  req.query.sort = "-ratingsAverage,price";
+  req.query.fields = "name,ratingsAverage,price,summary,difficulty";
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
- try {
+  try {
+    // EXECUTE QUERY
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
 
-  // Build QUERY
-   const queryObj = { ...req.query }
-   const excludedFields = ['page', 'sort', 'limit', 'fields'];
-   excludedFields.forEach(el => delete queryObj[el]);
-   
-  // Advanced FILTERING
-  // { difficulty: 'easy, duration: { $gte: 5 }} --> Obj we pass in query filter
-  // { difficulty: 'easy, duration: { gte: 5 }} --> Obj we get from req.query
-  let queryString = JSON.stringify(queryObj)
-  queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
-
-  console.log(queryObj);
-  // console.log(JSON.parse(queryString));
-
-  //  1 way to filter :- 
-  // const query = Tour.find(queryObj); --> Simple Filter Query
-  let query = Tour.find(JSON.parse(queryString)); // --> Advanced Pilter Query
-
-  // 2 way to filter :-
-  // const query = await Tour.find().where('duration').equals(5).where('difficulty').equals('easy')
-
-
-  // EXECUTE QUERY
-  const tours = await query;
-
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
- } catch (error) {
-  res.status(404).json({
-    status: 'fail',
-    message: error
-  })
- } 
+    res.status(200).json({
+      status: "success",
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: "fail",
+      message: error,
+    });
+  }
 };
 
 exports.getTour = async (req, res) => {
   try {
-    const tour = await Tour.findById(req.params.id)
+    const tour = await Tour.findById(req.params.id);
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: {
-        tour
-      }
-    })
+        tour,
+      },
+    });
   } catch (error) {
     res.status(404).json({
       status: fail,
-      message: error
-    })
+      message: error,
+    });
   }
 };
 
 exports.createTour = async (req, res) => {
-  try { 
+  try {
     const newTour = await Tour.create(req.body);
     res.status(201).json({
-      status: 'success',
+      status: "success",
       data: {
-        tour: newTour
-      }
-    })
-    } catch (error) {
-      res.status(400).json({
-        status: 'fail',
-        message: error
-      })
-    }
+        tour: newTour,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      message: error,
+    });
+  }
 };
 
 exports.updateTour = async (req, res) => {
   try {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true
-    })
+      runValidators: true,
+    });
     res.status(200).json({
-      status: 'success',
+      status: "success",
       data: {
-        tour
-    }
-  });
+        tour,
+      },
+    });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
-      message: error
-    }) 
+      status: "fail",
+      message: error,
+    });
   }
-  
 };
 
 exports.deleteTour = async (req, res) => {
   try {
-    await Tour.findByIdAndDelete(req.params.id)
+    await Tour.findByIdAndDelete(req.params.id);
     res.status(204).json({
-      status: 'success',
-      data: null
-    })
+      status: "success",
+      data: null,
+    });
   } catch (error) {
     res.status(400).json({
-      status: 'fail',
-      message: error
-    })
+      status: "fail",
+      message: error,
+    });
   }
 };
