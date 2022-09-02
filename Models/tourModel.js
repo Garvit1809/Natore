@@ -86,6 +86,7 @@ const tourSchema = new mongoose.Schema(
 );
 
 
+// Poperties which we dont need to save in our DB
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
@@ -93,6 +94,7 @@ tourSchema.virtual('durationWeeks').get(function() {
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 tourSchema.pre('save', function(next) {
+  // console.log(this)
   this.slug = slugify(this.name, { lower: true });
   next();
 });
