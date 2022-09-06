@@ -21,6 +21,7 @@ const handleValidationErrorDB = err => {
 };
 
 const sendErrorDev = (err, res) => {
+  console.log(err.message);
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
@@ -32,9 +33,11 @@ const sendErrorDev = (err, res) => {
 const sendErrorProd = (err, res) => {
   // Operational, trusted error: send message to client
   if (err.isOperational) {
+    console.log(err.message);
     res.status(err.statusCode).json({
       status: err.status,
-      message: err.message
+      message: err.message,
+      lol: 'lol'
     });
 
     // Programming or other unknown error: don't leak error details
@@ -63,8 +66,7 @@ module.exports = (err, req, res, next) => {
   
       if (error.name === 'CastError') error = handleCastErrorDB(error);
       if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-      if (error.name === 'ValidationError')
-        error = handleValidationErrorDB(error);
+      if (error.name === 'ValidationError') error = handleValidationErrorDB(error);
   
       sendErrorProd(error, res);
     }
