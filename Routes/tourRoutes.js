@@ -1,5 +1,6 @@
 const express = require('express');
 const tourController = require('./../Controllers/tourController');
+const authController = require('./../Controllers/authController');
 
 const router = express.Router();
 
@@ -12,8 +13,8 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 router
   .route('/')
-  .get(tourController.getAllTours)
-  .post( tourController.createTour);
+  .get(authController.protect, tourController.getAllTours)
+  .post(authController.protect, tourController.createTour);
   // .post(tourController.checkBody, tourController.createTour); --> can pass middlewares like this
 
 router
