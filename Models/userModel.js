@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
     validate: [validator.isEmail, 'Please provide a valid email']
   },
   photo: String,
-  lol: String,
   role: {
     type: String,
     enum: ['user', 'guide', 'lead-guide', 'admin'],
@@ -61,12 +60,12 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-// userSchema.pre('save', function(next) {
-//   if (!this.isModified('password') || this.isNew) return next();
+userSchema.pre('save', function(next) {
+  if (!this.isModified('password') || this.isNew) return next();
 
-//   this.passwordChangedAt = Date.now() - 1000;
-//   next();
-// });
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
 
 // userSchema.pre(/^find/, function(next) {
 //   // this points to the current query
