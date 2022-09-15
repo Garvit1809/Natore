@@ -4,34 +4,6 @@ const APIFeatures = require('../Utils/apiFeatures');
 const AppError = require("../Utils/appError");
 const catchAsync = require('../Utils/catchAsync')
 
-// const fs = require('fs');
-
-// const tours = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-// );
-
-// exports.checkID = (req, res, next, val) => {
-//   console.log(`Tour id is: ${val}`);
-
-//   if (req.params.id * 1 > tours.length) {
-//     return res.status(404).json({
-//       status: 'fail',
-//       message: 'Invalid ID'
-//     });
-//   }
-//   next();
-// };
-
-// exports.checkBody = (req, res, next) => {
-//   if (!req.body.name || !req.body.price) {
-//     return res.status(400).json({
-//       status: 'fail',
-//       message: 'Missing name or price'
-//     });
-//   }
-//   next();
-// };
-
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = "5";
   req.query.sort = "-ratingsAverage,price";
@@ -58,7 +30,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('reviews');
 
   if (!tour) {
     return next(new AppError('No tour found with that ID', 404))
