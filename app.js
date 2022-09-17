@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const path = require('path');
 
 const AppError = require('./Utils/appError')
 const globalErrorHandle = require('./Controllers/errorController')
@@ -13,6 +14,12 @@ const userRouter = require('./Routes/userRoutes');
 const reviewRouter = require('./Routes/reviewRoutes');
 
 const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'))
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 1) MIDDLEWARES
 
@@ -56,9 +63,6 @@ app.use(
     ]
   })
 );
-
-// Serving static files
-app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
   console.log('Hello from the middleware 👋');
